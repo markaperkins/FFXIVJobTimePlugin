@@ -6,14 +6,14 @@ using System.Linq;
 
 namespace JobPlaytimeTracker.JobPlaytimeTracker.Commands
 {
-    internal class DisplayMainWindow(PluginContext context) : BaseCommand(context)
+    internal class DisplayMainWindow() : BaseCommand()
     {
         public override string CommandName { get; } = "/jobplaytimetracker";
         public override string HelpMessage { get; } = "Displays the main window for the Job Playtime Tracker plugin.";
 
         public override void OnExecuteHandler(string command, string args)
         {
-            Window? mainWindow = JobPlaytimeTrackerPlugin.PluginWindows.Windows.Where(window => window.GetType() == typeof(MainScreen))
+            Window? mainWindow = JobPlaytimeTrackerPlugin.Context.PluginWindows.Windows.Where(window => window.GetType() == typeof(MainScreen))
                                                                                .FirstOrDefault();
 
             if (mainWindow is not null)
