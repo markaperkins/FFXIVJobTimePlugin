@@ -13,7 +13,7 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.Commands
 
         public override void OnExecuteHandler(string command, string args)
         {
-            Window? mainWindow = JobPlaytimeTrackerPlugin.Context.PluginWindows.Windows.Where(window => window.GetType() == typeof(MainScreen))
+            Window? mainWindow = JobPlaytimeTrackerPlugin.Context.PluginWindows!.Windows.Where(window => window.GetType() == typeof(MainScreen))
                                                                                .FirstOrDefault();
 
             if (mainWindow is not null)

@@ -5,8 +5,8 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context
 {
     internal class PluginContext
     {
-        public WindowSystem PluginWindows { get; private set; }
-        public Configuration PluginConfiguration { get; private set; }
+        public WindowSystem? PluginWindows { get; private set; }
+        public Configuration? PluginConfiguration { get; private set; }
 
         public void Initialize()
         {
