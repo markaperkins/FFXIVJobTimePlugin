@@ -6,6 +6,8 @@ using JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context;
 using JobPlaytimeTracker.JobPlaytimeTracker.Exceptions;
 using JobPlaytimeTracker.Legos.Abstractions;
 using JobPlaytimeTracker.Legos.Interface;
+using JobPlaytimeTracker.Resources.Strings;
+using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,12 +37,21 @@ namespace JobPlaytimeTracker
         [PluginService] public static IClientState ClientState { get; private set; } = null!;
         [PluginService] public static IDataManager DataManager { get; private set; } = null!;
         [PluginService] public static IPluginLog Log { get; private set; } = null!;
+        [PluginService] public static IChatGui ChatGui { get; private set; } = null!;
         public static PluginContext Context { get; } = new();
+        public static MetricsDatabase Metrics { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the JobPlaytimeTrackerPlugin class.
         /// </summary>
-        public JobPlaytimeTrackerPlugin()
+        /// [RequiredVersion("1.0")] IDalamudPluginInterface pluginInterface,
+        public JobPlaytimeTrackerPlugin(IDalamudPluginInterface pluginInterface,
+                                        ITextureProvider textureProvider,
+                                        ICommandManager commandManager,
+                                        IClientState clientState,
+                                        IDataManager dataManager,
+                                        IPluginLog log,
+                                        IChatGui chatGui)
         {
             // Initialize objects
             JobPlaytimeTrackerPlugin.Context.Initialize();
@@ -51,8 +62,11 @@ namespace JobPlaytimeTracker
 
             // Register delegates
             PluginInterface.UiBuilder.Draw += DrawUI;
-            PluginInterface.UiBuilder.OpenConfigUi += delegate { new DisplayMainWindow().OnExecuteHandler("", ""); };
+            PluginInterface.UiBuilder.OpenMainUi += delegate { new DisplayMainWindow().OnExecuteHandler("", ""); };
+            PluginInterface.UiBuilder.OpenConfigUi += delegate { new DisplayConfigurationWindow().OnExecuteHandler("", ""); };
         }
+
+        
 
         /// <summary>
         /// Uses reflection to identify and load all objects that implement the BaseCommand class or one of its derivatives.
@@ -141,11 +155,26 @@ namespace JobPlaytimeTracker
                 {
                     CommandManager.RemoveHandler(command.CommandName);
                 }
+
+                // Dispose of in-memory database
+                // TODO: SAVE DATABASE BEFORE DISPOSE
+                JobPlaytimeTrackerPlugin.Metrics.Dispose();
             }
             else
             {
                 throw new UninitializedPluginEntityException("PluginWindows object not initialized in plugin Context.");
             }
+        }
+
+        public MetricsDatabase LoadInMemoryDatabase()
+        {
+            // Initialize connection to in-memory database
+            SqliteConnection inMemoryDatabase = new SqliteConnection("Data Source=:memory:");
+            inMemoryDatabase.Open();
+
+            // Initialize connection to backup SQLite database file
+            SqliteConnection backupDatabase = new SqliteConnection($"Data Source={Paths.DatabaseBackup}");
+            backupDatabase.Open();
         }
     }
 }

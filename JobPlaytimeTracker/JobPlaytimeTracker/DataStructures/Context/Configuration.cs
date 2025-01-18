@@ -1,9 +1,8 @@
 using Dalamud.Configuration;
 using Dalamud.Plugin;
-using JobPlaytimeTracker;
 using System;
 
-namespace JobPlaytimeTracker
+namespace JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context
 {
     [Serializable]
     public class Configuration : IPluginConfiguration
