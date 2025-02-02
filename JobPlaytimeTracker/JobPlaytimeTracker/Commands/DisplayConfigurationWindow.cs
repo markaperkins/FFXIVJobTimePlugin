@@ -1,4 +1,5 @@
 using Dalamud.Interface.Windowing;
+using JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context;
 using JobPlaytimeTracker.JobPlaytimeTracker.Windows;
 using JobPlaytimeTracker.Legos.Abstractions;
 using System.Linq;
@@ -11,9 +12,13 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.Commands
 
         public override string HelpMessage { get; } = "Displays the configuration window for the Job Playtime Tracker plugin.";
 
+        public DisplayConfigurationWindow(PluginContext context) : base(context)
+        {
+        }
+
         public override void OnExecuteHandler(string command, string args)
         {
-            Window? configWindow = JobPlaytimeTrackerPlugin.Context.PluginWindows!.Windows.Where(window => window.GetType() == typeof(ConfigurationScreen))
+            Window? configWindow = _context.PluginWindows!.Windows.Where(window => window.GetType() == typeof(ConfigurationScreen))
                                                                                           .FirstOrDefault();
 
             if (configWindow is not null)

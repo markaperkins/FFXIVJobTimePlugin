@@ -1,6 +1,6 @@
 namespace JobPlaytimeTracker.JobPlaytimeTracker.Enums
 {
-    internal enum FFXIVJob
+    public enum FFXIVJob
     {
         None,
         Gladiator,

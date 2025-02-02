@@ -1,8 +1,12 @@
+using Dalamud.Configuration;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using JobPlaytimeTracker.JobPlaytimeTracker.Commands;
 using JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context;
+using JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Entities;
+using JobPlaytimeTracker.JobPlaytimeTracker.Enums;
+using JobPlaytimeTracker.JobPlaytimeTracker.EventHandlers;
 using JobPlaytimeTracker.JobPlaytimeTracker.Exceptions;
 using JobPlaytimeTracker.Legos.Abstractions;
 using JobPlaytimeTracker.Legos.Interface;
@@ -10,8 +14,10 @@ using JobPlaytimeTracker.Resources.Strings;
 using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
 
 namespace JobPlaytimeTracker
 {
@@ -38,35 +44,49 @@ namespace JobPlaytimeTracker
         [PluginService] public static IDataManager DataManager { get; private set; } = null!;
         [PluginService] public static IPluginLog Log { get; private set; } = null!;
         [PluginService] public static IChatGui ChatGui { get; private set; } = null!;
-        public static PluginContext Context { get; } = new();
-        public static MetricsDatabase Metrics { get; private set; }
+        [PluginService] public static ICondition Conditions { get; private set; } = null!;
+        [PluginService] public static IFramework Framework { get; private set; } = null!;
+
+        // Instance objects and variables
+        private PluginContext Context { get; set; }
+        private Action _displayMainWindow;
+        private Action _displayConfigWindow;
+        private delegate void _displayConfigurationWindow();
 
         /// <summary>
         /// Initializes a new instance of the JobPlaytimeTrackerPlugin class.
         /// </summary>
         /// [RequiredVersion("1.0")] IDalamudPluginInterface pluginInterface,
-        public JobPlaytimeTrackerPlugin(IDalamudPluginInterface pluginInterface,
-                                        ITextureProvider textureProvider,
-                                        ICommandManager commandManager,
-                                        IClientState clientState,
-                                        IDataManager dataManager,
-                                        IPluginLog log,
-                                        IChatGui chatGui)
+        public JobPlaytimeTrackerPlugin()
         {
-            // Initialize objects
-            JobPlaytimeTrackerPlugin.Context.Initialize();
+            // Initialize plugin context
+            Context = new PluginContext(PluginInterface,
+                                        TextureProvider,
+                                        CommandManager,
+                                        ClientState,
+                                        DataManager,
+                                        Log,
+                                        ChatGui,
+                                        Conditions,
+                                        Framework);
+
+            // Validate plugin setup
+            if(Directory.Exists(Paths.MetricsDirectory) == false) Directory.CreateDirectory(Paths.MetricsDirectory);
 
             // Register plugin entities
             LoadWindows();
             LoadCommands();
 
             // Register delegates
-            PluginInterface.UiBuilder.Draw += DrawUI;
-            PluginInterface.UiBuilder.OpenMainUi += delegate { new DisplayMainWindow().OnExecuteHandler("", ""); };
-            PluginInterface.UiBuilder.OpenConfigUi += delegate { new DisplayConfigurationWindow().OnExecuteHandler("", ""); };
+            _displayMainWindow = delegate { new DisplayMainWindow(Context).OnExecuteHandler("", ""); };
+            _displayConfigWindow = delegate { new DisplayConfigurationWindow(Context).OnExecuteHandler("", ""); };
+            Context.PluginInterface.UiBuilder.Draw += DrawUI;
+            Context.PluginInterface.UiBuilder.OpenMainUi += _displayMainWindow;
+            Context.PluginInterface.UiBuilder.OpenConfigUi += _displayConfigWindow;
+            Context.ClientState.ClassJobChanged += Context.PlayerEventHandler.OnJobChange;
+            Context.Conditions.ConditionChange += Context.PlayerEventHandler.OnConditionChange;
+            Context.Framework.Update += Context.PlayerEventHandler.OnTick;
         }
-
-        
 
         /// <summary>
         /// Uses reflection to identify and load all objects that implement the BaseCommand class or one of its derivatives.
@@ -79,11 +99,11 @@ namespace JobPlaytimeTracker
                                                                 .Where(type => _baseCommandNamespaces.Contains(type.Namespace ?? "") &&
                                                                                typeof(ICommand).IsAssignableFrom(type) &&
                                                                                type.IsClass &&
-                                                                               !type.IsAbstract).Select(type => (ICommand)Activator.CreateInstance(type)!);
+                                                                               !type.IsAbstract).Select(type => (ICommand)Activator.CreateInstance(type, Context)!);
 
             foreach (ICommand command in commandInstances)
             {
-                CommandManager.AddHandler(command.CommandName, command.OnExecute);
+                Context.CommandManager.AddHandler(command.CommandName, command.OnExecute);
             }
         }
 
@@ -93,18 +113,18 @@ namespace JobPlaytimeTracker
         /// <exception cref="UninitializedPluginEntityException">Throws when Context.PluginWindows is null.</exception>
         private void LoadWindows()
         {
-            if (JobPlaytimeTrackerPlugin.Context.PluginWindows is not null)
+            if (Context.PluginWindows is not null)
             {
                 IEnumerable<BaseWindow> windowInstances = Assembly.GetExecutingAssembly()
                                                                   .GetTypes()
                                                                   .Where(type => _baseWindowNamespaces.Contains(type.Namespace ?? "") &&
                                                                                  typeof(BaseWindow).IsAssignableFrom(type) &&
                                                                                  type.IsClass &&
-                                                                                 !type.IsAbstract).Select(type => (BaseWindow)Activator.CreateInstance(type)!);
+                                                                                 !type.IsAbstract).Select(type => (BaseWindow)Activator.CreateInstance(type, Context)!);
 
                 foreach (BaseWindow window in windowInstances)
                 {
-                    JobPlaytimeTrackerPlugin.Context.PluginWindows.AddWindow(window);
+                    Context.PluginWindows.AddWindow(window);
                 }
             }
             else
@@ -119,9 +139,9 @@ namespace JobPlaytimeTracker
         /// <exception cref="UninitializedPluginEntityException">Throws when Context.PluginWindows is null.</exception>
         private void DrawUI()
         {
-            if (JobPlaytimeTrackerPlugin.Context.PluginWindows is not null)
+            if (Context.PluginWindows is not null)
             {
-                JobPlaytimeTrackerPlugin.Context.PluginWindows.Draw();
+                Context.PluginWindows.Draw();
             }
             else
             {
@@ -135,14 +155,33 @@ namespace JobPlaytimeTracker
         /// <exception cref="UninitializedPluginEntityException">Throws when Context.PluginWindows is null.</exception>
         public void Dispose()
         {
-            if (JobPlaytimeTrackerPlugin.Context.PluginWindows is not null)
+            // Remove delegates
+            Context.ClientState.ClassJobChanged -= Context.PlayerEventHandler.OnJobChange;
+            Context.Conditions.ConditionChange -= Context.PlayerEventHandler.OnConditionChange;
+            Context.Framework.Update -= Context.PlayerEventHandler.OnTick;
+            Context.PluginInterface.UiBuilder.Draw -= DrawUI;
+            Context.PluginInterface.UiBuilder.OpenMainUi -= _displayMainWindow;
+            Context.PluginInterface.UiBuilder.OpenConfigUi -= _displayConfigWindow;
+
+            // Save TimeSpan metrics
+            ClientStateEvent dummyClientStateUpdated = new ClientStateEvent(Context);
+            dummyClientStateUpdated.OnJobChange((uint)FFXIVJob.None); // Save played time
+
+            // Save metrics
+            string jsonData = JsonSerializer.Serialize<Player>(Context.CurrentPlayer, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(Path.Combine(Paths.MetricsDirectory, $"{Context.CurrentPlayer.PlayerName}.json"), jsonData);
+
+            // Save configuration
+            Context.PluginConfiguration!.Save();
+
+            if (Context.PluginWindows is not null)
             {
                 // Dispose of all windows and clear window system
-                foreach (BaseWindow window in JobPlaytimeTrackerPlugin.Context.PluginWindows.Windows)
+                foreach (BaseWindow window in Context.PluginWindows.Windows)
                 {
                     window.Dispose();
                 }
-                JobPlaytimeTrackerPlugin.Context.PluginWindows.RemoveAllWindows();
+                Context.PluginWindows.RemoveAllWindows();
 
                 // Dispose of all commands
                 IEnumerable<ICommand> commandInstances = Assembly.GetExecutingAssembly()
@@ -150,31 +189,16 @@ namespace JobPlaytimeTracker
                                                         .Where(type => _baseCommandNamespaces.Contains(type.Namespace ?? "") &&
                                                                        typeof(ICommand).IsAssignableFrom(type) &&
                                                                        type.IsClass &&
-                                                                       !type.IsAbstract).Select(type => (ICommand)Activator.CreateInstance(type)!);
+                                                                       !type.IsAbstract).Select(type => (ICommand)Activator.CreateInstance(type, Context)!);
                 foreach (ICommand command in commandInstances)
                 {
-                    CommandManager.RemoveHandler(command.CommandName);
+                    Context.CommandManager.RemoveHandler(command.CommandName);
                 }
-
-                // Dispose of in-memory database
-                // TODO: SAVE DATABASE BEFORE DISPOSE
-                JobPlaytimeTrackerPlugin.Metrics.Dispose();
             }
             else
             {
                 throw new UninitializedPluginEntityException("PluginWindows object not initialized in plugin Context.");
             }
-        }
-
-        public MetricsDatabase LoadInMemoryDatabase()
-        {
-            // Initialize connection to in-memory database
-            SqliteConnection inMemoryDatabase = new SqliteConnection("Data Source=:memory:");
-            inMemoryDatabase.Open();
-
-            // Initialize connection to backup SQLite database file
-            SqliteConnection backupDatabase = new SqliteConnection($"Data Source={Paths.DatabaseBackup}");
-            backupDatabase.Open();
         }
     }
 }

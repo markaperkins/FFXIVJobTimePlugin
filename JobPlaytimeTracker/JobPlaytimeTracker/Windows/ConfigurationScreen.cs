@@ -1,4 +1,5 @@
 using ImGuiNET;
+using JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context;
 using JobPlaytimeTracker.Legos.Abstractions;
 using System.Numerics;
 
@@ -15,10 +16,14 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.Windows
         private int xWidth = 232;
         private int yWidth = 90;
 
-        public ConfigurationScreen() : base(name: _windowName, 
-                                            flags: _windowFlags, 
-                                            forceMainWindow: _forceMainWindow)
+        public ConfigurationScreen(PluginContext context) : base(context: context,
+                                                                 name: _windowName, 
+                                                                 flags: _windowFlags, 
+                                                                 forceMainWindow: _forceMainWindow)
         {
+            Context = context;
+
+            // Configure window
             Size = new Vector2(xWidth, yWidth);
             SizeCondition = ImGuiCond.Always;
         }
@@ -27,7 +32,7 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.Windows
 
         public override void PreDraw()
         {
-            if (JobPlaytimeTrackerPlugin.Context.PluginConfiguration!.IsConfigWindowMovable)
+            if (Context.PluginConfiguration!.IsConfigWindowMovable)
             {
                 Flags &= ~ImGuiWindowFlags.NoMove;
             }
@@ -39,18 +44,18 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.Windows
 
         public override void Draw()
         {
-            bool dummyConfigValue = JobPlaytimeTrackerPlugin.Context.PluginConfiguration!.SomePropertyToBeSavedAndWithADefault;
-            if(ImGui.Checkbox("Random Config Bool", ref dummyConfigValue))
+            bool dummyConfigValue = Context.PluginConfiguration!.SomePropertyToBeSavedAndWithADefault;
+            if (ImGui.Checkbox("Random Config Bool", ref dummyConfigValue))
             {
-                JobPlaytimeTrackerPlugin.Context.PluginConfiguration!.SomePropertyToBeSavedAndWithADefault = dummyConfigValue;
-                JobPlaytimeTrackerPlugin.Context.PluginConfiguration!.Save();
+                Context.PluginConfiguration!.SomePropertyToBeSavedAndWithADefault = dummyConfigValue;
+                Context.PluginConfiguration!.Save();
             }
 
-            bool movableConfigurationWindow = JobPlaytimeTrackerPlugin.Context.PluginConfiguration!.IsConfigWindowMovable;
+            bool movableConfigurationWindow = Context.PluginConfiguration!.IsConfigWindowMovable;
             if (ImGui.Checkbox("Movable Config Window", ref movableConfigurationWindow))
             {
-                JobPlaytimeTrackerPlugin.Context.PluginConfiguration!.IsConfigWindowMovable = movableConfigurationWindow;
-                JobPlaytimeTrackerPlugin.Context.PluginConfiguration!.Save();
+                Context.PluginConfiguration!.IsConfigWindowMovable = movableConfigurationWindow;
+                Context.PluginConfiguration!.Save();
             }
         }
     }

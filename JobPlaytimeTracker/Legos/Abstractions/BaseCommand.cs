@@ -1,4 +1,5 @@
 using Dalamud.Game.Command;
+using JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context;
 using JobPlaytimeTracker.Legos.Interface;
 
 namespace JobPlaytimeTracker.Legos.Abstractions
@@ -8,9 +9,11 @@ namespace JobPlaytimeTracker.Legos.Abstractions
         public abstract string CommandName { get; }
         public abstract string HelpMessage { get; }
         public CommandInfo OnExecute { get; }
+        protected PluginContext _context;
 
-        public BaseCommand()
+        public BaseCommand(PluginContext context)
         {
+            _context = context;
             OnExecute = new CommandInfo(OnExecuteHandler);
             OnExecute.HelpMessage = HelpMessage;
         }

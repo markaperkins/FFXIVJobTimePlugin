@@ -1,13 +1,17 @@
 using Dalamud.Interface.Windowing;
 using ImGuiNET;
+using JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context;
 using JobPlaytimeTracker.Legos.Interfaces;
 
 namespace JobPlaytimeTracker.Legos.Abstractions
 {
     internal abstract class BaseWindow : Window, IWindow
     {
-        protected BaseWindow(string name, ImGuiWindowFlags flags = ImGuiWindowFlags.None, bool forceMainWindow = false) : base(name, flags, forceMainWindow)
+        internal PluginContext Context { get; set; }
+
+        protected BaseWindow(PluginContext context, string name, ImGuiWindowFlags flags = ImGuiWindowFlags.None, bool forceMainWindow = false) : base(name, flags, forceMainWindow)
         {
+            Context = context;
         }
 
         public abstract void Dispose();

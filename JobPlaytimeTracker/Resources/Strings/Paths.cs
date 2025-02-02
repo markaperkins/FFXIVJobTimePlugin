@@ -10,11 +10,12 @@ namespace JobPlaytimeTracker.Resources.Strings
         /// </summary>
         public static readonly string PluginDirectory  = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                                                                       "XIVLauncher",
+                                                                      "installedPlugins",
                                                                       About.PluginShortName);
 
         /// <summary>
         /// The backup database path, as PluginDirectory/metrics.db
         /// </summary>
-        public static readonly string DatabaseBackup = Path.Combine(PluginDirectory, "metrics.db");
+        public static readonly string MetricsDirectory = Path.Combine(PluginDirectory, "metrics");
     }
 }
