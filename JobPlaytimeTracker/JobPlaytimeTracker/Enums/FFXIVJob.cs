@@ -42,6 +42,8 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.Enums
         Gunbreaker,
         Dancer,
         Reaper,
-        Sage
+        Sage,
+        Pictomancer,
+        Viper
     }
 }
