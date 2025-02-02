@@ -19,8 +19,6 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.EventHandlers
         public EventStateFlags EventStates { get; private set; }
         public Dictionary<string, DateTime> EventStartTimes { get; private set; }
 
-        private string tempHolder = "";
-
         public ClientStateEvent(PluginContext context) 
         {
             _context = context;
