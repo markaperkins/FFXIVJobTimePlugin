@@ -1,4 +1,5 @@
 using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Interface.Windowing;
 using ImGuiNET;
 using JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context;
 using JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Entities;
@@ -28,7 +29,7 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.Windows
         string TimeSpanFormat = @"hh\:mm\:ss";
 
         // Instance variables
-        private int _currentSelectedJobIndex;
+        public int CurrentSelectedJobIndex;
 
         public MainScreen(PluginContext context) : base(context: context,
                                                         name: _windowName, 
@@ -36,7 +37,7 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.Windows
                                                         forceMainWindow: _forceMainWindow)
         {
             // Initialize variables
-            _currentSelectedJobIndex = 0;
+            CurrentSelectedJobIndex = 0;
 
             // Configure window display
             Size = new Vector2(WindowWidth, WindowHeight);
@@ -60,7 +61,7 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.Windows
             ImGui.SetCursorPos(new Vector2(95, 27));
             ImGui.SetNextItemWidth(590);
             string[] jobList = GenerateJobList();
-            ImGui.Combo("##cmbJobSelector-Mainscreen", ref _currentSelectedJobIndex, jobList, jobList.Count());
+            ImGui.Combo("##cmbJobSelector-Mainscreen", ref CurrentSelectedJobIndex, jobList, jobList.Count());
 
             // Draw a seperator to split the UI between the selection box and display
             ImGui.SetCursorPos(new Vector2(0, 55));
@@ -79,7 +80,7 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.Windows
                 ImGui.TableHeadersRow();
 
                 // Populate table with metrics
-                JobMetric selectedJob = Context.CurrentPlayer.Jobs.FirstOrDefault<JobMetric>(metric => (int)metric.JobID == _currentSelectedJobIndex) ?? new JobMetric((FFXIVJob)_currentSelectedJobIndex);
+                JobMetric selectedJob = Context.CurrentPlayer.Jobs.FirstOrDefault<JobMetric>(metric => (int)metric.JobID == CurrentSelectedJobIndex) ?? new JobMetric((FFXIVJob)CurrentSelectedJobIndex);
                 foreach (PropertyInfo property in GetPropertiesToDisplay())
                 {
                     // Resolve metric display values
@@ -169,7 +170,7 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.Windows
 
         private IOrderedEnumerable<PropertyInfo> GetPropertiesToDisplay()
         {
-            JobMetric selectedJob = Context.CurrentPlayer.Jobs.FirstOrDefault<JobMetric>(metric => (int)metric.JobID == _currentSelectedJobIndex) ?? new JobMetric((FFXIVJob)_currentSelectedJobIndex);
+            JobMetric selectedJob = Context.CurrentPlayer.Jobs.FirstOrDefault<JobMetric>(metric => (int)metric.JobID == CurrentSelectedJobIndex) ?? new JobMetric((FFXIVJob)CurrentSelectedJobIndex);
             return selectedJob.GetType().GetProperties().Where(p => p.GetCustomAttribute<DisplayableMetric>() != null)
                                                                      .OrderBy(p => p.GetCustomAttribute<DisplayAttribute>()?.Order ?? int.MaxValue);
         }
