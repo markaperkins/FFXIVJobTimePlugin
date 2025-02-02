@@ -34,6 +34,7 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context
         public ICondition Conditions { get; private set; }
         public ClientStateEvent PlayerEventHandler { get; private set; }
         public IFramework Framework { get; private set; }
+        public IDtrBar DtrBar { get; private set; }
 
         public PluginContext(IDalamudPluginInterface pluginInterface,
                              ITextureProvider textureProvider,
@@ -43,7 +44,8 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context
                              IPluginLog log,
                              IChatGui chatGUI,
                              ICondition conditions,
-                             IFramework framework)
+                             IFramework framework,
+                             IDtrBar dtrBar)
         {
             // Store references to plugin services
             PluginInterface = pluginInterface;
@@ -53,6 +55,7 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context
             DataManager = dataManager;
             Log = log;
             ChatGUI = chatGUI;
+            DtrBar = dtrBar;
 
             // Load current player's metrics
             string playerName = ClientState.LocalPlayer?.Name.ToString() ?? "Unknown";
