@@ -1,4 +1,5 @@
-{
+[
+  {
     "Author": "Zuiko",
     "Name": "FFXIV Job Playtime Tracker",
     "InternalName": "JobPlaytimeTracker",
@@ -15,3 +16,4 @@
     "DownloadLinkUpdate": "https://github.com/markaperkins/FFXIVJobTimePlugin/releases/download/Beta/latest.zip",
     "AcceptsFeedback": true
   }
+]
