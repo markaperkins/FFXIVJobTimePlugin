@@ -46,12 +46,13 @@ namespace JobPlaytimeTracker
         [PluginService] public static IChatGui ChatGui { get; private set; } = null!;
         [PluginService] public static ICondition Conditions { get; private set; } = null!;
         [PluginService] public static IFramework Framework { get; private set; } = null!;
+        [PluginService] public static IDtrBar DtrBar { get; private set; } = null!;
 
         // Instance objects and variables
         private PluginContext Context { get; set; }
         private Action _displayMainWindow;
         private Action _displayConfigWindow;
-        private delegate void _displayConfigurationWindow();
+        private ServerBarEvent _serverBarEventHandler;
 
         /// <summary>
         /// Initializes a new instance of the JobPlaytimeTrackerPlugin class.
@@ -68,24 +69,29 @@ namespace JobPlaytimeTracker
                                         Log,
                                         ChatGui,
                                         Conditions,
-                                        Framework);
+                                        Framework,
+                                        DtrBar);
+
+            // Initialize instance objects and variables
+            _displayMainWindow = delegate { new DisplayMainWindow(Context).OnExecuteHandler("", ""); };
+            _displayConfigWindow = delegate { new DisplayConfigurationWindow(Context).OnExecuteHandler("", ""); };
+            _serverBarEventHandler = new ServerBarEvent(Context);
 
             // Validate plugin setup
-            if(Directory.Exists(Paths.MetricsDirectory) == false) Directory.CreateDirectory(Paths.MetricsDirectory);
+            if (Directory.Exists(Paths.MetricsDirectory) == false) Directory.CreateDirectory(Paths.MetricsDirectory);
 
             // Register plugin entities
             LoadWindows();
             LoadCommands();
 
             // Register delegates
-            _displayMainWindow = delegate { new DisplayMainWindow(Context).OnExecuteHandler("", ""); };
-            _displayConfigWindow = delegate { new DisplayConfigurationWindow(Context).OnExecuteHandler("", ""); };
             Context.PluginInterface.UiBuilder.Draw += DrawUI;
             Context.PluginInterface.UiBuilder.OpenMainUi += _displayMainWindow;
             Context.PluginInterface.UiBuilder.OpenConfigUi += _displayConfigWindow;
             Context.ClientState.ClassJobChanged += Context.PlayerEventHandler.OnJobChange;
             Context.Conditions.ConditionChange += Context.PlayerEventHandler.OnConditionChange;
             Context.Framework.Update += Context.PlayerEventHandler.OnTick;
+            Context.Framework.Update += _serverBarEventHandler.OnTick;
         }
 
         /// <summary>
@@ -158,6 +164,7 @@ namespace JobPlaytimeTracker
             // Remove delegates
             Context.ClientState.ClassJobChanged -= Context.PlayerEventHandler.OnJobChange;
             Context.Conditions.ConditionChange -= Context.PlayerEventHandler.OnConditionChange;
+            Context.Framework.Update -= _serverBarEventHandler.OnTick;
             Context.Framework.Update -= Context.PlayerEventHandler.OnTick;
             Context.PluginInterface.UiBuilder.Draw -= DrawUI;
             Context.PluginInterface.UiBuilder.OpenMainUi -= _displayMainWindow;
