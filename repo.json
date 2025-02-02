@@ -11,7 +11,7 @@
     "CanUnloadAsync": false,
     "LoadPriority": 0,
     "Punchline": "Tracks metrics job-by-job. Show window with /jobplaytimetracker.",
-    "DownloadLinkInstall": "vhttps://github.com/markaperkins/FFXIVJobTimePlugin/releases/download/Beta/latest.zip",
+    "DownloadLinkInstall": "https://github.com/markaperkins/FFXIVJobTimePlugin/releases/download/Beta/latest.zip",
     "DownloadLinkUpdate": "https://github.com/markaperkins/FFXIVJobTimePlugin/releases/download/Beta/latest.zip",
     "AcceptsFeedback": true
   }
