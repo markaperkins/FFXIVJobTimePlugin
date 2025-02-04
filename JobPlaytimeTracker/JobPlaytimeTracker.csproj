@@ -11,6 +11,10 @@
     <EnableNETAnalyzers>False</EnableNETAnalyzers>
     <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="JobPlaytimeTracker\Watchers\**" />
+    <EmbeddedResource Remove="JobPlaytimeTracker\Watchers\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <Content Include="..\Data\goat.png">
@@ -20,7 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="JobPlaytimeTracker\Watchers\" />
     <Folder Include="Resources\Images\" />
   </ItemGroup>
 

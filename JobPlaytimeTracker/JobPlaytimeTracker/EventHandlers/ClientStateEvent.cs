@@ -45,6 +45,9 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.EventHandlers
         /// <param name="classJobId">The new ClassJob id.</param>
         public void OnJobChange(uint classJobId)
         {
+            // Gate function to return if there isn't a player to log metrics to
+            if (_context.CurrentPlayer is null) return;
+
             // Register update and job change
             TimeSpan elapsedTime = _context.ReceivedUpdate();
             FFXIVJob previousJob = _context.UpdateCurrentJob((FFXIVJob)classJobId);
@@ -80,6 +83,9 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.EventHandlers
         /// <param name="value"></param>
         private void HandleJobStateChange(ConditionFlag flag, bool value)
         {
+            // Gate function to return if there isn't a player to log metrics to
+            if (_context.CurrentPlayer is null) return;
+
             if (value == true)
             {
                 if (EventStartTimes.ContainsKey(flag.ToString()))
@@ -123,6 +129,9 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.EventHandlers
 
         private void CheckOnlineStatus(string onlineStatus)
         {
+            // Gate function to return if there isn't a player to log metrics to
+            if (_context.CurrentPlayer is null) return;
+
             // Store evaluation results that are used multiple times
             bool evalResult_IsStatusAFK = onlineStatus.Equals("Away from Keyboard");
             bool evalResult_IsAFKFlagSet = EventStates.HasFlag(EventStateFlags.PlayerIsAFK);
@@ -164,6 +173,9 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.EventHandlers
         {
             // Gate function to return if this function is somehow called while LocalPlayer is null (logged out)
             if (_context.ClientState.LocalPlayer is null) return;
+
+            // Gate function to return if this function is somehow called while CurrentPlayer is null
+            if (_context.CurrentPlayer is null) return;
 
             // Gate function to avoid processing multiple deaths. The RIP flag is set at the conclusion of the first
             // function call, and is unset on the first tick when the player is no longer dead.

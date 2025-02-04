@@ -28,7 +28,7 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context
         public IDataManager DataManager { get; private set; }
         public IPluginLog Log { get; private set; }
         public IChatGui ChatGUI { get; private set; }
-        public Player CurrentPlayer { get; private set; }
+        public Player? CurrentPlayer { get; private set; }
         public DateTime LastUpdate { get; private set; }
         public FFXIVJob CurrentJob { get; private set; }
         public ICondition Conditions { get; private set; }
@@ -56,19 +56,6 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context
             Log = log;
             ChatGUI = chatGUI;
             DtrBar = dtrBar;
-
-            // Load current player's metrics
-            string playerName = ClientState.LocalPlayer?.Name.ToString() ?? "Unknown";
-            string metricsFile = Path.Combine(Paths.MetricsDirectory, $"{playerName}.json");
-            if (File.Exists(metricsFile))
-            {
-                string data = File.ReadAllText(metricsFile);
-                CurrentPlayer = JsonSerializer.Deserialize<Player>(data) ?? new Player(playerName);
-            }
-            else
-            {
-                CurrentPlayer = new Player(playerName);
-            }
 
             // Seed update time and job
             _ = ReceivedUpdate();
@@ -130,6 +117,19 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context
         public void UpdatePlayer(Player newPlayer)
         {
             CurrentPlayer = newPlayer;
+        }
+
+        public void UpdatePlayer()
+        {
+            // Load current player's metrics
+            string playerName = ClientState.LocalPlayer?.Name.ToString() ?? "Unknown";
+            Player loadedPlayer = Player.LoadPlayer(this, playerName);
+
+            // Save previous metrics
+            if(CurrentPlayer is not null) Player.SavePlayer(CurrentPlayer);
+
+            // Swap current character
+            CurrentPlayer = loadedPlayer;
         }
 
         public bool IsPlayerDiscipleOfHand()

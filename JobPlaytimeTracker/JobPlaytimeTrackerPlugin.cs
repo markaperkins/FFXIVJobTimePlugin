@@ -49,7 +49,9 @@ namespace JobPlaytimeTracker
         [PluginService] public static IDtrBar DtrBar { get; private set; } = null!;
 
         // Instance objects and variables
-        private PluginContext Context { get; set; }
+#pragma warning disable CS8618 // Due to when Dalamud injects the plugin services, PluginContext cannot be initialized inside of the static constructor. An approximation is made by instead having it initialized first in the instance constructor.
+        private static PluginContext Context { get; set; }
+#pragma warning restore CS8618
         private Action _displayMainWindow;
         private Action _displayConfigWindow;
         private ServerBarEvent _serverBarEventHandler;
@@ -71,6 +73,7 @@ namespace JobPlaytimeTracker
                                         Conditions,
                                         Framework,
                                         DtrBar);
+            Context.UpdatePlayer(Player.LoadPlayer(Context, ClientState.LocalPlayer?.Name.ToString() ?? "Unknown"));
 
             // Initialize instance objects and variables
             _displayMainWindow = delegate { new DisplayMainWindow(Context).OnExecuteHandler("", ""); };
@@ -89,9 +92,20 @@ namespace JobPlaytimeTracker
             Context.PluginInterface.UiBuilder.OpenMainUi += _displayMainWindow;
             Context.PluginInterface.UiBuilder.OpenConfigUi += _displayConfigWindow;
             Context.ClientState.ClassJobChanged += Context.PlayerEventHandler.OnJobChange;
+            Context.ClientState.Login += Context.UpdatePlayer;
+            Context.ClientState.Logout += Player.OnLogout;
             Context.Conditions.ConditionChange += Context.PlayerEventHandler.OnConditionChange;
             Context.Framework.Update += Context.PlayerEventHandler.OnTick;
             Context.Framework.Update += _serverBarEventHandler.OnTick;
+        }
+
+        /// <summary>
+        /// Allows an instance to request the current context. This is necessary for deserialization constructors.
+        /// </summary>
+        /// <returns></returns>
+        public static PluginContext RequestContext()
+        {
+            return Context;
         }
 
         /// <summary>
@@ -163,6 +177,8 @@ namespace JobPlaytimeTracker
         {
             // Remove delegates
             Context.ClientState.ClassJobChanged -= Context.PlayerEventHandler.OnJobChange;
+            Context.ClientState.Login -= Context.UpdatePlayer;
+            Context.ClientState.Logout -= Player.OnLogout;
             Context.Conditions.ConditionChange -= Context.PlayerEventHandler.OnConditionChange;
             Context.Framework.Update -= _serverBarEventHandler.OnTick;
             Context.Framework.Update -= Context.PlayerEventHandler.OnTick;
@@ -175,8 +191,7 @@ namespace JobPlaytimeTracker
             dummyClientStateUpdated.OnJobChange((uint)FFXIVJob.None); // Save played time
 
             // Save metrics
-            string jsonData = JsonSerializer.Serialize<Player>(Context.CurrentPlayer, new JsonSerializerOptions { WriteIndented = true });
-            File.WriteAllText(Path.Combine(Paths.MetricsDirectory, $"{Context.CurrentPlayer.PlayerName}.json"), jsonData);
+            Player.SavePlayer(Context.CurrentPlayer!);
 
             // Save configuration
             Context.PluginConfiguration!.Save();

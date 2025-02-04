@@ -80,7 +80,8 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.Windows
                 ImGui.TableHeadersRow();
 
                 // Populate table with metrics
-                JobMetric selectedJob = Context.CurrentPlayer.Jobs.FirstOrDefault<JobMetric>(metric => (int)metric.JobID == CurrentSelectedJobIndex) ?? new JobMetric((FFXIVJob)CurrentSelectedJobIndex);
+                Player currentPlayer = (Context.CurrentPlayer ?? new Player(Context, "Unknown"));
+                JobMetric selectedJob = currentPlayer.Jobs.FirstOrDefault<JobMetric>(metric => (int)metric.JobID == CurrentSelectedJobIndex) ?? new JobMetric((FFXIVJob)CurrentSelectedJobIndex);
                 foreach (PropertyInfo property in GetPropertiesToDisplay())
                 {
                     // Resolve metric display values
@@ -170,7 +171,10 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.Windows
 
         private IOrderedEnumerable<PropertyInfo> GetPropertiesToDisplay()
         {
-            JobMetric selectedJob = Context.CurrentPlayer.Jobs.FirstOrDefault<JobMetric>(metric => (int)metric.JobID == CurrentSelectedJobIndex) ?? new JobMetric((FFXIVJob)CurrentSelectedJobIndex);
+            Player currentPlayer = Context.CurrentPlayer ?? new Player(Context, "Unknown");
+
+            JobMetric selectedJob = currentPlayer.Jobs.FirstOrDefault<JobMetric>(metric => (int)metric.JobID == CurrentSelectedJobIndex) ?? new JobMetric((FFXIVJob)CurrentSelectedJobIndex);
+
             return selectedJob.GetType().GetProperties().Where(p => p.GetCustomAttribute<DisplayableMetric>() != null)
                                                                      .OrderBy(p => p.GetCustomAttribute<DisplayAttribute>()?.Order ?? int.MaxValue);
         }
