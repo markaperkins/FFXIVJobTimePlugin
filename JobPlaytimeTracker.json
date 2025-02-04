@@ -3,7 +3,7 @@
     "Author": "Zuiko",
     "Name": "FFXIV Job Playtime Tracker",
     "InternalName": "JobPlaytimeTracker",
-    "AssemblyVersion": "0.0.0.5",
+    "AssemblyVersion": "0.0.0.6",
     "Description": "Tracks metrics job-by-job. Show window with /jobplaytimetracker.",
     "ApplicableVersion": "any",
     "DalamudApiLevel": 11,
@@ -12,8 +12,8 @@
     "CanUnloadAsync": false,
     "LoadPriority": 0,
     "Punchline": "Tracks metrics job-by-job. Show window with /jobplaytimetracker.",
-    "DownloadLinkInstall": "https://github.com/markaperkins/FFXIVJobTimePlugin/releases/download/Beta-0.0.0.5/latest.zip",
-    "DownloadLinkUpdate": "https://github.com/markaperkins/FFXIVJobTimePlugin/releases/download/Beta-0.0.0.5/latest.zip",
+    "DownloadLinkInstall": "https://github.com/markaperkins/FFXIVJobTimePlugin/releases/download/Beta-0.0.0.6/latest.zip",
+    "DownloadLinkUpdate": "https://github.com/markaperkins/FFXIVJobTimePlugin/releases/download/Beta-0.0.0.6/latest.zip",
     "AcceptsFeedback": true
   }
 ]
