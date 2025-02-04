@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Dalamud.NET.SDK/11.0.0">
   <PropertyGroup>
-    <Version>0.0.0.1</Version>
+    <Version>1.0.9165.0</Version>
     <Description>A sample plugin.</Description>
     <PackageProjectUrl>https://github.com/goatcorp/SamplePlugin</PackageProjectUrl>
     <PackageLicenseExpression>GPL-3.0</PackageLicenseExpression>
@@ -10,6 +10,7 @@
     <RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
     <EnableNETAnalyzers>False</EnableNETAnalyzers>
     <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
+    <IncrementVersionOnBuild>1.0.%2a</IncrementVersionOnBuild>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="JobPlaytimeTracker\Watchers\**" />
