@@ -16,27 +16,14 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.EventHandlers
     public class ClientStateEvent
     {
         private PluginContext _context;
-        public EventStateFlags EventStates { get; private set; }
+        public EventStateFlags EventStates { get; set; }
         public Dictionary<string, DateTime> EventStartTimes { get; private set; }
 
         public ClientStateEvent(PluginContext context) 
         {
             _context = context;
             EventStartTimes = new Dictionary<string, DateTime>();
-
-            // Set current states
             EventStates = EventStateFlags.None;
-            if (_context.ClientState.LocalPlayer is not null)
-            {
-                if (_context.ClientState.LocalPlayer.IsDead) EventStates |= EventStateFlags.PlayerIsRIP;
-
-                if (_context.ClientState.LocalPlayer.OnlineStatus.Value.Name.Equals("AFK")) EventStates |= EventStateFlags.PlayerIsAFK;
-
-                if (_context.Conditions[ConditionFlag.InCombat] ||
-                    _context.Conditions[ConditionFlag.Crafting] || 
-                    _context.Conditions[ConditionFlag.Gathering]) 
-                        EventStates |= EventStateFlags.PlayerJobIsActive;
-            }
         }
                                         
         /// <summary>

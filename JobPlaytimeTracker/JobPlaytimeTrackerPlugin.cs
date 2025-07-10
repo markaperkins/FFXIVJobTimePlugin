@@ -1,10 +1,13 @@
 using Dalamud.Configuration;
+using Dalamud.Game.ClientState.Conditions;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
+using FFXIVClientStructs.FFXIV.Client.Game.Event;
 using JobPlaytimeTracker.JobPlaytimeTracker.Commands;
 using JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context;
 using JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Entities;
+using JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Flags;
 using JobPlaytimeTracker.JobPlaytimeTracker.Enums;
 using JobPlaytimeTracker.JobPlaytimeTracker.EventHandlers;
 using JobPlaytimeTracker.JobPlaytimeTracker.Exceptions;
@@ -12,6 +15,7 @@ using JobPlaytimeTracker.Legos.Abstractions;
 using JobPlaytimeTracker.Legos.Interface;
 using JobPlaytimeTracker.Resources.Strings;
 using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -55,6 +59,7 @@ namespace JobPlaytimeTracker
         private Action _displayMainWindow;
         private Action _displayConfigWindow;
         private ServerBarEvent _serverBarEventHandler;
+        private bool _isInitialized;
 
         /// <summary>
         /// Initializes a new instance of the JobPlaytimeTrackerPlugin class.
@@ -73,12 +78,12 @@ namespace JobPlaytimeTracker
                                         Conditions,
                                         Framework,
                                         DtrBar);
-            Context.UpdatePlayer(Player.LoadPlayer(Context, ClientState.LocalPlayer?.Name.ToString() ?? "Unknown"));
 
             // Initialize instance objects and variables
             _displayMainWindow = delegate { new DisplayMainWindow(Context).OnExecuteHandler("", ""); };
             _displayConfigWindow = delegate { new DisplayConfigurationWindow(Context).OnExecuteHandler("", ""); };
             _serverBarEventHandler = new ServerBarEvent(Context);
+            _isInitialized = false;
 
             // Validate plugin setup
             if (Directory.Exists(Paths.MetricsDirectory) == false) Directory.CreateDirectory(Paths.MetricsDirectory);
@@ -97,6 +102,30 @@ namespace JobPlaytimeTracker
             Context.Conditions.ConditionChange += Context.PlayerEventHandler.OnConditionChange;
             Context.Framework.Update += Context.PlayerEventHandler.OnTick;
             Context.Framework.Update += _serverBarEventHandler.OnTick;
+            Context.Framework.Update += OnFrameworkUpdate;
+        }
+
+        private void OnFrameworkUpdate(IFramework framework)
+        {
+            if (_isInitialized == false)
+            {
+                Context.UpdatePlayer(Player.LoadPlayer(Context, ClientState.LocalPlayer?.Name.ToString() ?? "Unknown"));
+                Context.UpdateCurrentJob((ClientState.LocalPlayer is not null) ? (FFXIVJob)(ClientState.LocalPlayer.ClassJob.RowId) : FFXIVJob.None);
+
+                if (Context.ClientState.LocalPlayer is not null)
+                {
+                    if (Context.ClientState.LocalPlayer.IsDead) Context.PlayerEventHandler.EventStates |= EventStateFlags.PlayerIsRIP;
+
+                    if (Context.ClientState.LocalPlayer.OnlineStatus.Value.Name.Equals("AFK")) Context.PlayerEventHandler.EventStates |= EventStateFlags.PlayerIsAFK;
+
+                    if (Context.Conditions[ConditionFlag.InCombat] ||
+                        Context.Conditions[ConditionFlag.Crafting] ||
+                        Context.Conditions[ConditionFlag.Gathering])
+                        Context.PlayerEventHandler.EventStates |= EventStateFlags.PlayerJobIsActive;
+                }
+
+                _isInitialized = true;
+            }
         }
 
         /// <summary>

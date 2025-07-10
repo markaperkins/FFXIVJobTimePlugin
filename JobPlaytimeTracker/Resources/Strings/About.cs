@@ -4,6 +4,6 @@ namespace JobPlaytimeTracker.Resources.Strings
     {
         public const string PluginName = "FFXIV Job Metrics Tracker";
         public const string PluginShortName = "JobPlaytimeTracker";
-        public const int Version = 6;
+        public const int Version = 12;
     }
 }

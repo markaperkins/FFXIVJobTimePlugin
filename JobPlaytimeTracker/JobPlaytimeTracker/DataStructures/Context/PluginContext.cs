@@ -59,7 +59,6 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context
 
             // Seed update time and job
             _ = ReceivedUpdate();
-            _ = UpdateCurrentJob((ClientState.LocalPlayer is not null) ? (FFXIVJob)(ClientState.LocalPlayer.ClassJob.RowId) : FFXIVJob.None);
 
             // Initialize the plugin window system
             PluginWindows = new(Assembly.GetExecutingAssembly().GetName().Name!);
