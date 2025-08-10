@@ -6,7 +6,7 @@
     "AssemblyVersion": "1.0.9321.0",
     "Description": "Tracks metrics job-by-job. Show window with /jobplaytimetracker.",
     "ApplicableVersion": "any",
-    "DalamudApiLevel": 12,
+    "DalamudApiLevel": 13,
     "LoadRequiredState": 0,
     "LoadSync": false,
     "CanUnloadAsync": false,
