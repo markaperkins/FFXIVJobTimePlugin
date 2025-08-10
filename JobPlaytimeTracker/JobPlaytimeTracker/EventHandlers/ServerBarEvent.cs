@@ -1,4 +1,4 @@
-﻿using Dalamud.Game.Gui.Dtr;
+using Dalamud.Game.Gui.Dtr;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
 using JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context;
@@ -23,7 +23,7 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.EventHandlers
             _serverBarEntry = _context.DtrBar.Get("JobPlaytimeTracker");
             _serverBarEntry.Text = "Loading...";
             _serverBarEntry.Shown = true;
-            _serverBarEntry.OnClick += OnClick;
+            _serverBarEntry.OnClick += ((_) => OnClick());
         }
 
         public void OnTick(IFramework framework)

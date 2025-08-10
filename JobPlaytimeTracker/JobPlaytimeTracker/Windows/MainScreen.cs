@@ -1,6 +1,7 @@
 using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context;
 using JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Entities;
 using JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Flags;
@@ -41,7 +42,7 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.Windows
 
             // Configure window display
             Size = new Vector2(WindowWidth, WindowHeight);
-            SizeCondition = ImGuiCond.Always;
+            //SizeCondition = ImGuiCond.Always;
         }
 
         public override void Dispose()

@@ -1,4 +1,4 @@
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context;
 using JobPlaytimeTracker.Legos.Abstractions;
 using System.Numerics;
@@ -25,7 +25,7 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.Windows
 
             // Configure window
             Size = new Vector2(xWidth, yWidth);
-            SizeCondition = ImGuiCond.Always;
+            //SizeCondition = ImGuiCond.Always;
         }
 
         public override void Dispose() { }

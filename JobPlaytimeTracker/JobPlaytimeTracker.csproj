@@ -1,41 +1,47 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Dalamud.NET.SDK/11.0.0">
-  <PropertyGroup>
-    <Version>1.0.9321.0</Version>
-    <Description>A sample plugin.</Description>
-    <PackageProjectUrl>https://github.com/goatcorp/SamplePlugin</PackageProjectUrl>
-    <PackageLicenseExpression>GPL-3.0</PackageLicenseExpression>
-    <IsPackable>false</IsPackable>
-    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
-    <RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
-    <EnableNETAnalyzers>False</EnableNETAnalyzers>
-    <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
-    <IncrementVersionOnBuild>1.0.%2a</IncrementVersionOnBuild>
-    <TargetFramework>net9.0-windows7.0</TargetFramework>
-  </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="JobPlaytimeTracker\Watchers\**" />
-    <EmbeddedResource Remove="JobPlaytimeTracker\Watchers\**" />
-  </ItemGroup>
+<Project Sdk="Dalamud.NET.Sdk/13.0.0">
+    <PropertyGroup>
+        <TargetFramework>net9.0-windows7.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <LangVersion>latest</LangVersion>
 
-  <ItemGroup>
-    <Content Include="..\Data\goat.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>false</Visible>
-    </Content>
-  </ItemGroup>
+        <Version>1.0.9353.0</Version>
+        <Description>A sample plugin.</Description>
+        <PackageProjectUrl>https://github.com/goatcorp/SamplePlugin</PackageProjectUrl>
+        <PackageLicenseExpression>GPL-3.0</PackageLicenseExpression>
+        <IsPackable>false</IsPackable>
+        <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+        <RunAnalyzersDuringBuild>False</RunAnalyzersDuringBuild>
+        <EnableNETAnalyzers>False</EnableNETAnalyzers>
+        <RunAnalyzersDuringLiveAnalysis>False</RunAnalyzersDuringLiveAnalysis>
+        <IncrementVersionOnBuild>1.0.%2a</IncrementVersionOnBuild>
+        <AssemblyVersion></AssemblyVersion>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Resources\Images\" />
-  </ItemGroup>
+    <ItemGroup>
+        <Compile Remove="JobPlaytimeTracker\Watchers\**" />
+        <EmbeddedResource Remove="JobPlaytimeTracker\Watchers\**" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.7" />
-  </ItemGroup>
+    <ItemGroup>
+        <Content Include="..\Data\goat.png">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <Visible>false</Visible>
+        </Content>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Update="DalamudPackager" Version="12.0.0" />
-    <PackageReference Update="DotNet.ReproducibleBuilds" Version="1.2.25" />
-  </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Resources\Images\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.8" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="DalamudPackager" Version="13.*" PrivateAssets="all" />
+        <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.2.25" PrivateAssets="all" />
+    </ItemGroup>
 </Project>
