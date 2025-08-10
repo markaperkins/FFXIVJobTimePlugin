@@ -3,7 +3,7 @@
     "Author": "Zuiko",
     "Name": "FFXIV Job Playtime Tracker",
     "InternalName": "JobPlaytimeTracker",
-    "AssemblyVersion": "1.0.9321.0",
+    "AssemblyVersion": "1.0.9353.0",
     "Description": "Tracks metrics job-by-job. Show window with /jobplaytimetracker.",
     "ApplicableVersion": "any",
     "DalamudApiLevel": 13,
