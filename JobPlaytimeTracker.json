@@ -12,8 +12,8 @@
     "CanUnloadAsync": false,
     "LoadPriority": 0,
     "Punchline": "Tracks metrics job-by-job. Show window with /jobplaytimetracker.",
-    "DownloadLinkInstall": "https://github.com/markaperkins/FFXIVJobTimePlugin/releases/download/Beta-0.0.0.9/JobPlaytimeTracker-beta-0.0.0.9.zip",
-    "DownloadLinkUpdate": "https://github.com/markaperkins/FFXIVJobTimePlugin/releases/download/Beta-0.0.0.9/JobPlaytimeTracker-beta-0.0.0.9.zip",
+    "DownloadLinkInstall": "https://github.com/markaperkins/FFXIVJobTimePlugin/releases/download/Beta-0.0.0.10/FFXIVJobPlaytimePlugin-Beta-0.0.0.10.zip",
+    "DownloadLinkUpdate": "https://github.com/markaperkins/FFXIVJobTimePlugin/releases/download/Beta-0.0.0.10/FFXIVJobPlaytimePlugin-Beta-0.0.0.10.zip",
     "AcceptsFeedback": true
   }
 ]
