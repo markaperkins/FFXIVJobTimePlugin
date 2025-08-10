@@ -1,3 +1,4 @@
+using Dalamud.Plugin.Services;
 using FFXIVClientStructs.FFXIV.Client.Graphics;
 using JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context;
 using JobPlaytimeTracker.JobPlaytimeTracker.Enums;
@@ -152,6 +153,23 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Entities
         public static void OnLogout(int type, int code)
         {
             PluginContext currentContext = JobPlaytimeTrackerPlugin.RequestContext();
+
+            // Save the player's current time before it is erased
+            if(currentContext.CurrentPlayer is not null)
+            {
+                bool evalResult_IsStatusAFK = currentContext.ClientState.LocalPlayer.OnlineStatus.Value.Name.ToString().Equals("Away from Keyboard");
+
+                TimeSpan elapsedTime = currentContext.ReceivedUpdate();
+                if (evalResult_IsStatusAFK == true)
+                {
+                    currentContext.CurrentPlayer.AddAFKTime(elapsedTime, currentContext.CurrentJob);
+                }
+                else
+                {
+                    currentContext.CurrentPlayer.AddTimePlayed(elapsedTime, currentContext.CurrentJob);
+                }
+            }
+
             Player? toSave = currentContext.CurrentPlayer;
             if (toSave is not null)
                 Player.SavePlayer(toSave);
