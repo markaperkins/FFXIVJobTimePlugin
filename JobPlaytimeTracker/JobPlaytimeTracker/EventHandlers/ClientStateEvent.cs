@@ -108,7 +108,7 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.EventHandlers
 
         public void OnTick(IFramework framework)
         {
-            IPlayerCharacter? currentPlayer = _context.ClientState.LocalPlayer;
+            IPlayerCharacter? currentPlayer = _context.ObjectTable.LocalPlayer;
             if (currentPlayer is null) return; // Player is not logged in
 
             CheckOnlineStatus(currentPlayer.OnlineStatus.Value.Name.ToString());
@@ -159,7 +159,8 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.EventHandlers
         private void RegisterPlayerDeath()
         {
             // Gate function to return if this function is somehow called while LocalPlayer is null (logged out)
-            if (_context.ClientState.LocalPlayer is null) return;
+            IPlayerCharacter? currentPlayer = _context.ObjectTable.LocalPlayer;
+            if (currentPlayer is null) return;
 
             // Gate function to return if this function is somehow called while CurrentPlayer is null
             if (_context.CurrentPlayer is null) return;
@@ -168,7 +169,7 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.EventHandlers
             // function call, and is unset on the first tick when the player is no longer dead.
             if (EventStates.HasFlag(EventStateFlags.PlayerIsRIP)) return;
 
-            _context.CurrentPlayer.AddDeath((FFXIVJob)_context.ClientState.LocalPlayer.ClassJob.RowId);
+            _context.CurrentPlayer.AddDeath((FFXIVJob)currentPlayer.ClassJob.RowId);
         }
     }
 }
