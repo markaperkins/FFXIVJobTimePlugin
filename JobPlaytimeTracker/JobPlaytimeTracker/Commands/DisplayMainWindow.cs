@@ -1,4 +1,3 @@
-using Dalamud.Interface.Windowing;
 using JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context;
 using JobPlaytimeTracker.JobPlaytimeTracker.Windows;
 using JobPlaytimeTracker.Legos.Abstractions;
@@ -17,8 +16,7 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.Commands
 
         public override void OnExecuteHandler(string command, string args)
         {
-            Window? mainWindow = _context.PluginWindows!.Windows.Where(window => window.GetType() == typeof(MainScreen))
-                                                                                       .FirstOrDefault();
+            MainScreen? mainWindow = _context.PluginWindows!.Windows.OfType<MainScreen>().FirstOrDefault();
 
             if (mainWindow is not null)
             {
