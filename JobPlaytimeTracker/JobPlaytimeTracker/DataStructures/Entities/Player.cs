@@ -157,7 +157,7 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Entities
             // Save the player's current time before it is erased
             if(currentContext.CurrentPlayer is not null)
             {
-                bool evalResult_IsStatusAFK = currentContext.ClientState.LocalPlayer.OnlineStatus.Value.Name.ToString().Equals("Away from Keyboard");
+                bool evalResult_IsStatusAFK = currentContext.ObjectTable.LocalPlayer?.OnlineStatus.Value.Name.ToString().Equals("Away from Keyboard") ?? false;
 
                 TimeSpan elapsedTime = currentContext.ReceivedUpdate();
                 if (evalResult_IsStatusAFK == true)
