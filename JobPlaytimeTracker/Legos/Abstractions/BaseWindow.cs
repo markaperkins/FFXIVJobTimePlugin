@@ -5,7 +5,7 @@ using JobPlaytimeTracker.Legos.Interfaces;
 
 namespace JobPlaytimeTracker.Legos.Abstractions
 {
-    internal abstract class BaseWindow : Window, IWindow
+    internal abstract class BaseWindow : Window, Interfaces.IWindow
     {
         internal PluginContext Context { get; set; }
 
