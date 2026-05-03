@@ -36,16 +36,13 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.EventHandlers
         private void OnClick()
         {
             // Attempt to find reference to main window
-            Window? mainWindow = _context.PluginWindows!.Windows.Where(window => window.GetType() == typeof(MainScreen))
-                                                                .FirstOrDefault();
+            MainScreen? mainWindow = _context.PluginWindows!.Windows.OfType<MainScreen>().FirstOrDefault();
 
             // If reference is found, set the current selected job and then toggle window to display
             if (mainWindow is not null)
             {
-                MainScreen windowAsMainScreen = (MainScreen)mainWindow;
-
-                windowAsMainScreen.CurrentSelectedJobIndex = (int)_context.CurrentJob;
-                windowAsMainScreen.Toggle();
+                mainWindow.CurrentSelectedJobIndex = (int)_context.CurrentJob;
+                mainWindow.Toggle();
             }
         }
     }
