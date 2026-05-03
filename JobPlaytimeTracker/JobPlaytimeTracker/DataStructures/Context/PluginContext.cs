@@ -25,6 +25,8 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context
         public ITextureProvider TextureProvider { get; private set; }
         public ICommandManager CommandManager { get; private set; }
         public IClientState ClientState { get; private set; }
+        public IPlayerState PlayerState { get; private set; }
+        public IObjectTable ObjectTable { get; private set; }
         public IDataManager DataManager { get; private set; }
         public IPluginLog Log { get; private set; }
         public IChatGui ChatGUI { get; private set; }
@@ -40,6 +42,8 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context
                              ITextureProvider textureProvider,
                              ICommandManager commandManager,
                              IClientState clientState,
+                             IPlayerState playerState,
+                             IObjectTable objectTable,
                              IDataManager dataManager,
                              IPluginLog log,
                              IChatGui chatGUI,
@@ -52,6 +56,8 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context
             TextureProvider = textureProvider;
             CommandManager = commandManager;
             ClientState = clientState;
+            PlayerState = playerState;
+            ObjectTable = objectTable;
             DataManager = dataManager;
             Log = log;
             ChatGUI = chatGUI;
@@ -121,7 +127,7 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context
         public void UpdatePlayer()
         {
             // Load current player's metrics
-            string playerName = ClientState.LocalPlayer?.Name.ToString() ?? "Unknown";
+            string playerName = PlayerState.IsLoaded ? PlayerState.CharacterName.ToString() : "Unknown";
             Player loadedPlayer = Player.LoadPlayer(this, playerName);
 
             // Save previous metrics
@@ -133,7 +139,7 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context
 
         public bool IsPlayerDiscipleOfHand()
         {
-            if (ClientState.LocalPlayer == null) return false;
+            if (PlayerState.IsLoaded == false) return false;
 
             var craftingJobs = new HashSet<FFXIVJob>
             {
@@ -146,12 +152,12 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context
                 FFXIVJob.Alchemist,
                 FFXIVJob.Culinarian
             };
-            return craftingJobs.Contains((FFXIVJob)ClientState.LocalPlayer.ClassJob.RowId);
+            return craftingJobs.Contains((FFXIVJob)PlayerState.ClassJob.RowId);
         }
 
         public bool IsPlayerDiscipleOfLand()
         {
-            if (ClientState.LocalPlayer == null) return false;
+            if (PlayerState.IsLoaded == false) return false;
 
             var gatheringJobs = new HashSet<FFXIVJob>
             {
@@ -159,7 +165,7 @@ namespace JobPlaytimeTracker.JobPlaytimeTracker.DataStructures.Context
                 FFXIVJob.Botanist,
                 FFXIVJob.Fisher
             };
-            return gatheringJobs.Contains((FFXIVJob)ClientState.LocalPlayer.ClassJob.RowId);
+            return gatheringJobs.Contains((FFXIVJob)PlayerState.ClassJob.RowId);
         }
 
         public bool IsPlayerDiscipleOfWarMagic()
