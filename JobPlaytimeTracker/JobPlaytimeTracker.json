@@ -1,20 +1,20 @@
 {
-    "Author": "your name here",
-    "Name": "Sample Plugin",
+    "Author": "Zuiko",
+    "Name": "FFXIV Job Playtime Tracker",
     "InternalName": "JobPlaytimeTracker",
-    "AssemblyVersion": "1.0.9353.0",
-    "Description": "A description that shows up in /xlplugins. List any major slash-command(s).",
+    "AssemblyVersion": "1.0.9354.0",
+    "Description": "Tracks metrics job-by-job. Show window with /jobplaytimetracker.",
     "ApplicableVersion": "any",
     "Tags": [
-        "sample",
-        "plugin",
-        "goats"
+        "job",
+        "playtime",
+        "tracker"
     ],
-    "DalamudApiLevel": 13,
+    "DalamudApiLevel": 15,
     "LoadRequiredState": 0,
     "LoadSync": false,
     "CanUnloadAsync": false,
     "LoadPriority": 0,
-    "Punchline": "A short one-liner that shows up in /xlplugins.",
+    "Punchline": "Tracks metrics job-by-job. Show window with /jobplaytimetracker.",
     "AcceptsFeedback": true
 }

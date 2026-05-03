@@ -1,12 +1,12 @@
-<Project Sdk="Dalamud.NET.Sdk/13.0.0">
+<Project Sdk="Dalamud.NET.Sdk/15.0.0">
     <PropertyGroup>
-        <TargetFramework>net9.0-windows7.0</TargetFramework>
+        <TargetFramework>net10.0-windows</TargetFramework>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <LangVersion>latest</LangVersion>
 
-        <Version>1.0.9353.0</Version>
+        <Version>1.0.9354.0</Version>
         <Description>A sample plugin.</Description>
         <PackageProjectUrl>https://github.com/goatcorp/SamplePlugin</PackageProjectUrl>
         <PackageLicenseExpression>GPL-3.0</PackageLicenseExpression>
@@ -38,10 +38,5 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.8" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="DalamudPackager" Version="13.*" PrivateAssets="all" />
-        <PackageReference Include="DotNet.ReproducibleBuilds" Version="1.2.25" PrivateAssets="all" />
     </ItemGroup>
 </Project>

@@ -45,6 +45,8 @@ namespace JobPlaytimeTracker
         [PluginService] public static ITextureProvider TextureProvider { get; private set; } = null!;
         [PluginService] public static ICommandManager CommandManager { get; private set; } = null!;
         [PluginService] public static IClientState ClientState { get; private set; } = null!;
+        [PluginService] public static IPlayerState PlayerState { get; private set; } = null!;
+        [PluginService] public static IObjectTable ObjectTable { get; private set; } = null!;
         [PluginService] public static IDataManager DataManager { get; private set; } = null!;
         [PluginService] public static IPluginLog Log { get; private set; } = null!;
         [PluginService] public static IChatGui ChatGui { get; private set; } = null!;
@@ -72,6 +74,8 @@ namespace JobPlaytimeTracker
                                         TextureProvider,
                                         CommandManager,
                                         ClientState,
+                                        PlayerState,
+                                        ObjectTable,
                                         DataManager,
                                         Log,
                                         ChatGui,
@@ -109,14 +113,15 @@ namespace JobPlaytimeTracker
         {
             if (_isInitialized == false)
             {
-                Context.UpdatePlayer(Player.LoadPlayer(Context, ClientState.LocalPlayer?.Name.ToString() ?? "Unknown"));
-                Context.UpdateCurrentJob((ClientState.LocalPlayer is not null) ? (FFXIVJob)(ClientState.LocalPlayer.ClassJob.RowId) : FFXIVJob.None);
+                Context.UpdatePlayer(Player.LoadPlayer(Context, PlayerState.IsLoaded ? PlayerState.CharacterName.ToString() : "Unknown"));
+                Context.UpdateCurrentJob(PlayerState.IsLoaded ? (FFXIVJob)PlayerState.ClassJob.RowId : FFXIVJob.None);
 
-                if (Context.ClientState.LocalPlayer is not null)
+                var localPlayer = Context.ObjectTable.LocalPlayer;
+                if (localPlayer is not null)
                 {
-                    if (Context.ClientState.LocalPlayer.IsDead) Context.PlayerEventHandler.EventStates |= EventStateFlags.PlayerIsRIP;
+                    if (localPlayer.IsDead) Context.PlayerEventHandler.EventStates |= EventStateFlags.PlayerIsRIP;
 
-                    if (Context.ClientState.LocalPlayer.OnlineStatus.Value.Name.Equals("AFK")) Context.PlayerEventHandler.EventStates |= EventStateFlags.PlayerIsAFK;
+                    if (localPlayer.OnlineStatus.Value.Name.Equals("AFK")) Context.PlayerEventHandler.EventStates |= EventStateFlags.PlayerIsAFK;
 
                     if (Context.Conditions[ConditionFlag.InCombat] ||
                         Context.Conditions[ConditionFlag.Crafting] ||
